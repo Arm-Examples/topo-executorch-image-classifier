@@ -43,7 +43,7 @@ The easiest way to deploy is using `topo`. Download and install `topo` from [arm
 ### Clone the project:
 
 ```bash
-topo clone git@github.com:Arm-Examples/topo-image-classifier.git
+topo clone git@github.com:Arm-Examples/topo-executorch-image-classifier.git
 ```
 
 You will be prompted for the model repository - there is no default, so you must provide `MODEL`.
@@ -53,7 +53,7 @@ You will be prompted for the model repository - there is no default, so you must
 ```bash
 cd topo-image-classifier
 export HF_TOKEN=<your-hf-read-token>
-topo deploy --target <ip-address-of-target>
+topo deploy --target <user@hostname>
 ```
 
 topo builds the image **on your machine** (where the token lives) and ships the finished image to the device over SSH. The target needs neither the token nor network access for the model.
