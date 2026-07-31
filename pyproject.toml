@@ -1,0 +1,28 @@
+[project]
+name = "topo-image-classifier"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = []
+
+[dependency-groups]
+downloader = ["huggingface-hub>=1.26.0", "pyyaml>=6.0.3"]
+runtime = [
+    "executorch==1.2.0",
+    "gradio>=6.22.0",
+    "pillow>=12.3.0",
+    "pyyaml>=6.0.3",
+    "torch==2.12.1",
+    "torchvision>=0.27.1",
+]
+
+
+[tool.uv.sources]
+torch = [{ index = "pytorch-cpu" }]
+torchvision = [{ index = "pytorch-cpu" }]
+
+[[tool.uv.index]]
+name = "pytorch-cpu"
+url = "https://download.pytorch.org/whl/cpu"
+explicit = true
