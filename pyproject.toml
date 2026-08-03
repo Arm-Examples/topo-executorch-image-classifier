@@ -18,6 +18,24 @@ runtime = [
 ]
 
 
+[tool.uv]
+# ExecuTorch declares export and test dependencies that this runtime-only image does not use.
+exclude-dependencies = [
+    "coremltools",
+    "expecttest",
+    "hydra-core",
+    "hypothesis",
+    "kgb",
+    "parameterized",
+    "pytest",
+    "pytest-json-report",
+    "pytest-rerunfailures",
+    "pytest-xdist",
+    "pytorch-tokenizers",
+    "scikit-learn",
+    "torchao",
+]
+
 [tool.uv.sources]
 torch = [{ index = "pytorch-cpu" }]
 torchvision = [{ index = "pytorch-cpu" }]
