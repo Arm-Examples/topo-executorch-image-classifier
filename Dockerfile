@@ -17,7 +17,7 @@ WORKDIR /runtime
 COPY uv.lock pyproject.toml .python-version ./
 RUN uv sync --locked --no-install-project --only-group runtime
 
-COPY app app
 COPY --from=model-downloader /downloader/model model
+COPY app app
 
 CMD ["uv", "run", "app/server.py"]
