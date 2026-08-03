@@ -23,9 +23,9 @@ x-topo:
     own Arm device, upload your own images through a Gradio web UI, and measure
     whether it runs, how fast it is on your target, and whether it's good enough
     on your inputs. No GPU required.
-  deploy_success_message: |
+  deployment_success_message: |
     Image classifier is live — open http://<target>:7860 to upload an image.
-  args:
+  parameters:
     MODEL:
       description: "Hugging Face repository containing config.yaml, metadata.yaml, and an ExecuTorch model"
       required: true

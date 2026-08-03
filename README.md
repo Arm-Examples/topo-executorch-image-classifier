@@ -30,7 +30,7 @@ Working examples include:
 
 ## Build-Time Parameters
 
-The model identity is a Docker build argument (`x-topo.args` in `compose.yaml`), resolved at build time. There is no default—you must supply the Hugging Face repository ID. Its `metadata.yaml` identifies the `.pte` file to download.
+The model identity is a Docker build argument (`x-topo.parameters` in `compose.yaml`), resolved at build time. There is no default - you must supply the Hugging Face repository ID. Its `metadata.yaml` identifies the `.pte` file to download.
 
 | Parameter | Required | Description                   | Example                                |
 | --------- | -------- | ----------------------------- | -------------------------------------- |
