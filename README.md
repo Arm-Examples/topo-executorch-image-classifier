@@ -30,11 +30,11 @@ Working examples include:
 
 ## Build-Time Parameters
 
-The model identity is a Docker build argument (`x-topo.parameters` in `compose.yaml`), resolved at build time. There is no default - you must supply the Hugging Face repository ID. Its `metadata.yaml` identifies the `.pte` file to download.
+The model identity is a Docker build argument (`x-topo.parameters` in `compose.yaml`), resolved at build time. It defaults to `Arm/vit-base-int8-xnnpack-executorch`, but you can supply another compatible Hugging Face repository ID. The top-level `filename` field in its `metadata.yaml` identifies the `.pte` file to download.
 
-| Parameter | Required | Description                   | Example                                |
-| --------- | -------- | ----------------------------- | -------------------------------------- |
-| `MODEL`   | yes      | Hugging Face model repository | `Arm/vit-base-int8-xnnpack-executorch` |
+| Parameter | Required | Default                                | Description                   |
+| --------- | -------- | -------------------------------------- | ----------------------------- |
+| `MODEL`   | yes      | `Arm/vit-base-int8-xnnpack-executorch` | Hugging Face model repository |
 
 ## Usage
 
@@ -46,7 +46,7 @@ The easiest way to deploy is using `topo`. Download and install `topo` from [arm
 topo clone git@github.com:Arm-Examples/topo-executorch-image-classifier.git
 ```
 
-You will be prompted for the model repository - there is no default, so you must provide `MODEL`.
+Accept the default model, or pass `MODEL=<hugging-face-repository>` to select another compatible model.
 
 ### Build and Deploy the project:
 

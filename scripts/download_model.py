@@ -23,13 +23,12 @@ def main() -> None:
 
     metadata = download("metadata.yaml")
     assert metadata
-    meta = Path(metadata).read_text()
     try:
-        model = yaml.safe_load(meta)["context"]["model"]["filename"]
+        model = yaml.safe_load(Path(metadata).read_text())["filename"]
     except (KeyError, TypeError, yaml.YAMLError):
-        sys.exit("error: metadata.yaml must define context.model.filename")
+        sys.exit("error: metadata.yaml must define filename")
     if not isinstance(model, str) or not model.endswith(".pte"):
-        sys.exit("error: context.model.filename in metadata.yaml must name a .pte file")
+        sys.exit("error: filename in metadata.yaml must name a .pte file")
 
     download(model)
     download("config.yaml")
