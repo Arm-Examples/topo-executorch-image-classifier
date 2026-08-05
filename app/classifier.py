@@ -46,7 +46,7 @@ class Classifier:
         self.apply_softmax = postprocessing["softmax"]
         self.top_k = postprocessing["top_k"]
 
-        filename = metadata["context"]["model"]["filename"]
+        filename = metadata["filename"]
         self.model_path = (self.model_dir / filename).resolve()
         labels_path = self.model_dir / "imagenet_classes.json"
         if labels_path.is_file():
