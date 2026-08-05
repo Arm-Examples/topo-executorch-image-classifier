@@ -30,11 +30,11 @@ Working examples include:
 
 ## Build-Time Parameters
 
-The model identity is a Docker build argument (`x-topo.parameters` in `compose.yaml`), resolved at build time. It defaults to `Arm/vit-base-int8-xnnpack-executorch`, but you can supply another compatible Hugging Face repository ID. The top-level `filename` field in its `metadata.yaml` identifies the `.pte` file to download.
+The model identity is a Docker build argument (`x-topo.parameters` in `compose.yaml`), resolved at build time:
 
-| Parameter | Required | Default                                | Description                   |
-| --------- | -------- | -------------------------------------- | ----------------------------- |
-| `MODEL`   | yes      | `Arm/vit-base-int8-xnnpack-executorch` | Hugging Face model repository |
+| Parameter | Required | Description                   | Default                                |
+| --------- | -------- | ----------------------------- | -------------------------------------- |
+| `MODEL`   | yes      | Hugging Face model repository | `Arm/vit-base-int8-xnnpack-executorch` |
 
 ## Usage
 
