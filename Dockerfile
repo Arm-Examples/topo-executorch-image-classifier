@@ -1,4 +1,4 @@
-FROM ghcr.io/astral-sh/uv:alpine3.23 AS model-downloader
+FROM astral/uv:python3.12-bookworm-slim AS model-downloader
 
 WORKDIR /downloader
 
@@ -10,7 +10,7 @@ ENV MODEL=${MODEL}
 COPY scripts/download_model.py scripts/download_model.py
 RUN --mount=type=secret,id=hf_token,env=HF_TOKEN uv run scripts/download_model.py
 
-FROM ghcr.io/astral-sh/uv:trixie-slim AS runtime
+FROM astral/uv:python3.12-bookworm-slim AS runtime
 
 WORKDIR /runtime
 
