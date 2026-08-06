@@ -16,19 +16,16 @@ secrets:
     
 x-topo:
   name: "Image Classifier (ExecuTorch)"
-  type: "application"
   description: |
-    An on-device evaluation harness for Arm-optimised image-classification
-    models. Supply any ExecuTorch image-classification .pte model, deploy it to your
-    own Arm device, upload your own images through a Gradio web UI, and measure
-    whether it runs, how fast it is on your target, and whether it's good enough
-    on your inputs. No GPU required.
+    An on-device evaluation harness for compatible ExecuTorch image
+    classification models hosted on Hugging Face. Deploy the Project to an Arm
+    Target, upload images through a Gradio web interface, and measure inference
+    results and performance. No GPU is required.
   deployment_success_message: |
-    Image classifier is live — open http://<target>:7860 to upload an image.
+    Image classifier is running. Open http://<target-ip>:7860 to upload an image.
   parameters:
     MODEL:
       description: "Hugging Face repository containing config.yaml, metadata.yaml, and an ExecuTorch model"
-      required: true
       default: "Arm/vit-base-int8-xnnpack-executorch"
       example: "Arm/resnet-18-int8-xnnpack-executorch"
       hints:
