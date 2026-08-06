@@ -13,13 +13,13 @@ services:
 secrets:
   hf_token:
     environment: HF_TOKEN
-
+    
 x-topo:
   name: "Image Classifier (ExecuTorch)"
   type: "application"
   description: |
     An on-device evaluation harness for Arm-optimised image-classification
-    models. Supply any ExecuTorch image-classification .pte, deploy it to your
+    models. Supply any ExecuTorch image-classification .pte model, deploy it to your
     own Arm device, upload your own images through a Gradio web UI, and measure
     whether it runs, how fast it is on your target, and whether it's good enough
     on your inputs. No GPU required.
