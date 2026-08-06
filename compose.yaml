@@ -13,7 +13,7 @@ services:
 secrets:
   hf_token:
     environment: HF_TOKEN
-
+    
 x-topo:
   name: "Image Classifier (ExecuTorch)"
   description: |

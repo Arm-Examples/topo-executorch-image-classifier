@@ -19,61 +19,47 @@ _TRANSFORMS = {
 }
 
 
-def _build_preprocessor(steps: list) -> transforms.Compose:
-    pipeline = []
-    for step in steps:
-        name, options = (
-            (step, None) if isinstance(step, str) else next(iter(step.items()))
-        )
-        try:
-            factory = _TRANSFORMS[name]
-        except KeyError:
-            raise ValueError(f"unsupported preprocessing operation: {name}") from None
-        pipeline.append(factory(options))
-    return transforms.Compose(pipeline)
+def _load_yaml(path: Path) -> dict:
+    with path.open() as file:
+        return yaml.safe_load(file)
 
 
-class Classifier:
-    """Load one model directory and expose reusable classification operations."""
+class Preprocessor:
+    """Convert an input image into a batched model input tensor."""
 
-    def __init__(self, model_dir: str | Path):
-        self.model_dir = Path(model_dir)
-        config = self._load_yaml("config.yaml")
-        metadata = self._load_yaml("metadata.yaml")
+    def __init__(self, steps: list):
+        pipeline = []
+        for step in steps:
+            name, options = (
+                (step, None) if isinstance(step, str) else next(iter(step.items()))
+            )
+            try:
+                factory = _TRANSFORMS[name]
+            except KeyError:
+                raise ValueError(
+                    f"unsupported preprocessing operation: {name}"
+                ) from None
+            pipeline.append(factory(options))
+        self.pipeline = transforms.Compose(pipeline)
 
-        self._preprocessor = _build_preprocessor(config["input"]["preprocessing"])
-        postprocessing = config["output"]["postprocessing"]
-        self.apply_softmax = postprocessing["softmax"]
-        self.top_k = postprocessing["top_k"]
+    def __call__(self, image: Image.Image) -> torch.Tensor:
+        return self.pipeline(image.convert("RGB")).unsqueeze(0)
 
-        filename = metadata["filename"]
-        self.model_path = (self.model_dir / filename).resolve()
-        labels_path = self.model_dir / "imagenet_classes.json"
-        if labels_path.is_file():
-            with labels_path.open() as file:
-                self.labels = json.load(file)
-        else:
-            self.labels = {}
 
-        sample = self.model_dir / "sample_input.jpg"
-        self.sample_image = str(sample) if sample.is_file() else None
+class Postprocessor:
+    """Convert model output scores into labelled top-k predictions."""
 
-        program = Runtime.get().load_program(str(self.model_path))
-        self.method = program.load_method("forward")
-
-    def _load_yaml(self, filename: str) -> dict:
-        with (self.model_dir / filename).open() as file:
-            return yaml.safe_load(file)
+    def __init__(self, options: dict, labels: dict | list):
+        self.apply_softmax = options["softmax"]
+        self.top_k = options["top_k"]
+        self.labels = labels
 
     def _label(self, index: int) -> str:
         if isinstance(self.labels, dict):
             return self.labels.get(str(index), f"class_{index}")
         return self.labels[index] if index < len(self.labels) else f"class_{index}"
 
-    def _preprocess(self, image: Image.Image) -> torch.Tensor:
-        return self._preprocessor(image.convert("RGB")).unsqueeze(0)
-
-    def _postprocess(self, output) -> dict[str, float]:
+    def __call__(self, output) -> dict[str, float]:
         scores = torch.as_tensor(output, dtype=torch.float32).reshape(-1)
         if self.apply_softmax:
             scores = torch.softmax(scores, dim=-1)
@@ -83,6 +69,35 @@ class Classifier:
             for value, index in zip(values.tolist(), indices.tolist(), strict=True)
         }
 
+
+class Classifier:
+    """Load one model directory and expose reusable classification operations."""
+
+    def __init__(self, model_dir: str | Path):
+        model_dir = Path(model_dir)
+        config = _load_yaml(model_dir / "config.yaml")
+        self._preprocessor = Preprocessor(config["input"]["preprocessing"])
+
+        labels_path = model_dir / "imagenet_classes.json"
+        if labels_path.is_file():
+            with labels_path.open() as file:
+                labels = json.load(file)
+        else:
+            labels = {}
+        self._postprocessor = Postprocessor(
+            config["output"]["postprocessing"], labels
+        )
+        self.top_k = self._postprocessor.top_k
+
+        sample = model_dir / "sample_input.jpg"
+        self.sample_image = str(sample) if sample.is_file() else None
+
+        metadata = _load_yaml(model_dir / "metadata.yaml")
+        filename = metadata["filename"]
+        model_path = (model_dir / filename).resolve()
+        program = Runtime.get().load_program(str(model_path))
+        self.method = program.load_method("forward")
+
     def classify(
         self, image: Image.Image | None, runs: int = 20, warmup: int = 3
     ) -> tuple[dict[str, float], str]:
@@ -91,7 +106,7 @@ class Classifier:
             return {}, "_Upload an image to classify._"
 
         started = perf_counter()
-        input_tensor = self._preprocess(image)
+        input_tensor = self._preprocessor(image)
         preprocess_ms = (perf_counter() - started) * 1000
 
         for _ in range(max(0, warmup)):
@@ -105,7 +120,7 @@ class Classifier:
 
         latency = torch.tensor(latencies, dtype=torch.float64)
         p50_ms = float(torch.quantile(latency, 0.5))
-        return self._postprocess(output), (
+        return self._postprocessor(output), (
             f"**{p50_ms:.1f} ms** median inference "
             f"&nbsp;·&nbsp; **{1000.0 / p50_ms if p50_ms > 0 else 0.0:.0f}** img/s\n\n"
             f"<sub>p90 {float(torch.quantile(latency, 0.9)):.1f} ms · "
