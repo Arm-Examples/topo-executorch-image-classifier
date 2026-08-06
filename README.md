@@ -1,20 +1,20 @@
 # Image Classifier (ExecuTorch)
 
-> This project is a [Topo](https://github.com/arm/topo) template and follows the [Topo Project Specification](https://github.com/arm/topo/tree/main/docs/project-specification).
+> This project is a [Topo Project](https://github.com/arm/topo/blob/main/docs/introduction/glossary.md#topo-project) and follows the [Topo Project Specification](https://github.com/arm/topo/tree/main/docs/project-specification).
 
-An on-device evaluation harness for Arm-optimised image-classification models. Supply an ExecuTorch `.pte` model, deploy it to your own Arm device, upload your own images through a web UI and evaluate its performance on your real hardware.
+This Project provides an on-device evaluation harness for Arm-optimized image classification models. Select a compatible ExecuTorch `.pte` model, deploy the Project to an Arm Target, and upload images through the web interface. The dashboard reports prediction results and performance for the Target.
 
-It demonstrates:
+The Project demonstrates:
 
-- A multi-stage Docker build that bakes a Hugging Face model into the image at build time (the image ships self-contained, the device needs no token or network).
-- A config-driven CPU inference runner that sources config from the selected Hugging Face model repository to enable seamless model switching.
-- Per-image latency benchmarking (median / p90 over repeated runs after warmup) surfaced in an interactive web dashboard.
+- A multi-stage Docker build that downloads a Hugging Face model and embeds it in the image. The Target does not need the Hugging Face token or network access.
+- A configuration-driven CPU inference runner that reads configuration from the selected Hugging Face model repository.
+- Per-image latency benchmarking that reports the median and p90 after warmup runs.
 
-## Model Compatibility
+## Model compatibility
 
-Only Executorch image classification models on Hugging Face are supported by this project. Furthermore, model repositories must contain a `config.yaml` and `metadata.yaml` that define which `.pte` file to use, pre/post-processing steps and more. Optionally, repositories can also specify human-readable output labels in `imagenet_classes.json`.
+This Project supports only ExecuTorch image classification models hosted on Hugging Face. Each model repository must contain `config.yaml` and `metadata.yaml`. These files identify the `.pte` file and configure preprocessing and postprocessing. A repository can also provide human-readable output labels in `imagenet_classes.json`.
 
-Working examples include:
+Compatible examples include:
 
 - `Arm/deit-tiny-int8-xnnpack-executorch`
 - `Arm/googlenet-int8-xnnpack-executorch-graviton-g4`
@@ -28,36 +28,38 @@ Working examples include:
 - `Arm/swin-tiny-int8-xnnpack-executorch`
 - `Arm/vit-base-int8-xnnpack-executorch`
 
-## Build-Time Parameters
+## Build-time parameters
 
-The model identity is a Docker build argument (`x-topo.parameters` in `compose.yaml`), resolved at build time:
+The `MODEL` Project parameter is passed to Docker as a build argument and resolved at build time.
 
 | Parameter | Required | Description                   | Default                                |
 | --------- | -------- | ----------------------------- | -------------------------------------- |
-| `MODEL`   | yes      | Hugging Face model repository | `Arm/vit-base-int8-xnnpack-executorch` |
+| `MODEL`   | No       | Hugging Face model repository | `Arm/vit-base-int8-xnnpack-executorch` |
 
 ## Usage
 
-The easiest way to deploy is using `topo`. Download and install `topo` from [arm/topo](https://github.com/arm/topo).
+Install Topo by following the instructions in the [Topo repository](https://github.com/arm/topo).
 
-### Clone the project:
+### Clone the Project
+
+Clone the Project with the default model:
 
 ```bash
 topo clone git@github.com:Arm-Examples/topo-executorch-image-classifier.git
 ```
 
-Accept the default model, or pass `MODEL=<hugging-face-repository>` to select another compatible model.
+### Build and deploy the Project
 
-### Build and Deploy the project:
+Set a Hugging Face read token on the Host, and deploy the Project to the Target:
 
 ```bash
-cd topo-image-classifier
-export HF_TOKEN=<your-hf-read-token>
+cd topo-executorch-image-classifier
+export HF_TOKEN=<hugging-face-read-token>
 topo deploy --target <user@hostname>
 ```
 
-topo builds the image **on your machine** (where the token lives) and ships the finished image to the device over SSH. The target needs neither the token nor network access for the model.
+Topo builds the image on the Host and transfers the finished image to the Target over SSH. The Target does not receive the token and does not need network access to download the model.
 
-### What you will see
+### Open the web interface
 
-Once deployment completes, open a browser to `http://<ip-address-of-target>:7860`. Upload an image to get the top-k predicted classes, each with a confidence score, plus the measured inference latency (median / p90 over repeated runs after a warmup) for that target.
+After deployment, open `http://<target-ip>:7860` in a browser. Upload an image to see the top predicted classes, confidence scores, and inference latency for the Target.
