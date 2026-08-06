@@ -1088,7 +1088,7 @@ wheels = [
 ]
 
 [[package]]
-name = "topo-image-classifier"
+name = "topo-executorch-image-classifier"
 version = "0.1.0"
 source = { virtual = "." }
 
