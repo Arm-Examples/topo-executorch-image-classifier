@@ -8,7 +8,13 @@ from classifier import Classifier
 MODEL_DIR = "model"
 
 
-def build_demo(classifier: Classifier) -> gr.Interface:
+def build_demo(classifier: Classifier) -> gr.Blocks:
+    description = classifier.description
+    if classifier.id:
+        description = (
+            f"[{classifier.id}](https://www.huggingface.co/{classifier.id}) -- "
+        ) + description
+
     return gr.Interface(
         fn=classifier.classify,
         inputs=gr.Image(type="pil", label="Image", sources=["upload", "clipboard"]),
@@ -17,8 +23,8 @@ def build_demo(classifier: Classifier) -> gr.Interface:
             gr.Markdown(),
         ],
         examples=[classifier.sample_image] if classifier.sample_image else None,
-        title="Edge Image Classifier",
-        description="Upload an image to classify it and see the top predictions.",
+        title=classifier.title,
+        description=description,
         submit_btn="Classify",
         clear_btn=None,
         flagging_mode="never",
