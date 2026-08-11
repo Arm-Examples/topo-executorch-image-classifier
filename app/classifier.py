@@ -84,15 +84,20 @@ class Classifier:
                 labels = json.load(file)
         else:
             labels = {}
-        self._postprocessor = Postprocessor(
-            config["output"]["postprocessing"], labels
-        )
+        self._postprocessor = Postprocessor(config["output"]["postprocessing"], labels)
         self.top_k = self._postprocessor.top_k
 
         sample = model_dir / "sample_input.jpg"
         self.sample_image = str(sample) if sample.is_file() else None
 
         metadata = _load_yaml(model_dir / "metadata.yaml")
+
+        self.title = metadata.get("title", "Image Classifier")
+        self.id = metadata.get("id")
+        self.description = metadata.get(
+            "description", "Upload an image to classify it and see the top predictions."
+        )
+
         filename = metadata["filename"]
         model_path = (model_dir / filename).resolve()
         program = Runtime.get().load_program(str(model_path))
