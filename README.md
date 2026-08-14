@@ -45,7 +45,7 @@ Install Topo by following the instructions in the [Topo repository](https://gith
 The clone step will prompt you for value for the `MODEL` parameter. Leave the input empty to select the default.
 
 ```bash
-topo clone git@github.com:Arm-Examples/topo-executorch-image-classifier.git
+topo clone https://github.com/Arm-Examples/topo-executorch-image-classifier.git
 ```
 
 ### Build and deploy the Project
