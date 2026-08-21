@@ -1,8 +1,8 @@
-# Image Classifier (ExecuTorch)
+# Image Classifier (ExecuTorch + XNNPACK)
 
 > This project is a [Topo Project](https://github.com/arm/topo/blob/main/docs/introduction/glossary.md#topo-project) and follows the [Topo Project Specification](https://github.com/arm/topo/tree/main/docs/project-specification).
 
-This Project provides an on-device evaluation harness for Arm-optimized image classification models. Select a compatible ExecuTorch `.pte` model, deploy the Project to an Arm Target, and upload images through the web interface. The dashboard reports prediction results and performance for the Target.
+This Project provides an on-device evaluation harness for Arm-optimized ExecuTorch image classification models that use the XNNPACK backend. Select a compatible `.pte` model, deploy the Project to an Arm Target, and upload images through the web interface. The dashboard reports prediction results and performance for the Target.
 
 The Project demonstrates:
 
@@ -12,15 +12,15 @@ The Project demonstrates:
 
 ## Model compatibility
 
-This Project supports only ExecuTorch image classification models hosted on Hugging Face. Each model repository must contain `config.yaml` and `metadata.yaml`. These files identify the `.pte` file and configure preprocessing and postprocessing. A repository can also provide human-readable output labels in `imagenet_classes.json`.
+This Project supports only ExecuTorch image classification models that use the XNNPACK backend and are hosted on Hugging Face. Each model repository must contain `config.yaml` and `metadata.yaml`. These files identify the `.pte` file and configure preprocessing and postprocessing. A repository can also provide human-readable output labels in `imagenet_classes.json`.
 
 ## Build-time parameters
 
 The `MODEL` Project parameter is passed to Docker as a build argument and resolved at build time.
 
-| Parameter | Required | Description                   | Default                                |
-| --------- | -------- | ----------------------------- | -------------------------------------- |
-| `MODEL`   | No       | Hugging Face model repository | `Arm/vit-base-int8-xnnpack-executorch` |
+| Parameter | Required | Description                                              | Default                                |
+| --------- | -------- | -------------------------------------------------------- | -------------------------------------- |
+| `MODEL`   | No       | ExecuTorch + XNNPACK model repository on Hugging Face    | `Arm/vit-base-int8-xnnpack-executorch` |
 
 ## Usage
 
