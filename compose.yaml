@@ -4,7 +4,7 @@ services:
     build:
       context: .
       args:
-        MODEL: Arm/vit-base-int8-xnnpack-executorch
+        HF_REPO_ID: Arm/vit-base-int8-xnnpack-executorch
       secrets:
         - hf_token
     ports:
@@ -31,7 +31,7 @@ x-topo:
     Run `topo ps` and wait until the classifier service reports a healthy status.
     Then open http://<target-ip>:7860 in your browser to upload images.
   parameters:
-    MODEL:
+    HF_REPO_ID:
       description: >-
         Hugging Face repository containing config.yaml, metadata.yaml, and an
         ExecuTorch model that uses the XNNPACK backend

@@ -18,8 +18,8 @@ def download(repo: str, filename: str, required: bool = True) -> str | None:
 
 
 def main() -> None:
-    repo = os.getenv("MODEL") or sys.exit(
-        "error: MODEL must be a Hugging Face repo ID, for example 'Arm/vit-base-int8-xnnpack-executorch'"
+    repo = os.getenv("HF_REPO_ID") or sys.exit(
+        "error: HF_REPO_ID must be a Hugging Face repo ID, for example 'Arm/vit-base-int8-xnnpack-executorch'"
     )
 
     metadata = download(repo, "metadata.yaml")
