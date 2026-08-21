@@ -30,11 +30,12 @@ Compatible examples include:
 
 ## Build-time parameters
 
-The `MODEL` Project parameter is passed to Docker as a build argument and resolved at build time.
+The `MODEL` and `HF_ENDPOINT` Project parameters are passed to Docker as build arguments and resolved at build time.
 
-| Parameter | Required | Description                   | Default                                |
-| --------- | -------- | ----------------------------- | -------------------------------------- |
-| `MODEL`   | No       | Hugging Face model repository | `Arm/vit-base-int8-xnnpack-executorch` |
+| Parameter     | Required | Description                   | Default                                |
+| ------------- | -------- | ----------------------------- | -------------------------------------- |
+| `MODEL`       | No       | Hugging Face model repository | `Arm/vit-base-int8-xnnpack-executorch` |
+| `HF_ENDPOINT` | No       | Hugging Face API endpoint     | `https://huggingface.co`               |
 
 ## Usage
 
@@ -42,7 +43,7 @@ Install Topo by following the instructions in the [Topo repository](https://gith
 
 ### Clone the Project
 
-The clone step will prompt you for value for the `MODEL` parameter. Leave the input empty to select the default.
+The clone step will prompt you for values for the `MODEL` and `HF_ENDPOINT` parameters. Leave either input empty to select its default.
 
 ```bash
 topo clone https://github.com/Arm-Examples/topo-executorch-image-classifier.git
