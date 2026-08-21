@@ -16,7 +16,7 @@ human() {
 display_help() {
     cat << EOF
 Usage:
-  hfd <REPO_ID> [--include pattern ...] [--exclude pattern ...] [--hf_token token] [-x threads] [-j jobs] [--local-dir path] [--revision rev]
+  hfd <REPO_ID> [--include pattern ...] [--exclude pattern ...] [-x threads] [-j jobs] [--local-dir path] [--revision rev]
 
 Description:
   Downloads a model from Hugging Face using aria2c.
@@ -24,7 +24,6 @@ Description:
 Options:
   --include       File patterns to include.
   --exclude       File patterns to exclude.
-  --hf_token      Hugging Face token for authentication.
   -x              Connections per server (default: 4, maximum: 10).
   -j              Concurrent downloads (default: 5, maximum: 10).
   --local-dir     Destination directory (default: the repository name).
@@ -33,7 +32,6 @@ Options:
 Examples:
   hfd gpt2
   hfd bigscience/bloom-560m --exclude '*.safetensors'
-  hfd meta-llama/Llama-2-7b --hf_token hf_***
 EOF
     exit 1
 }
@@ -57,6 +55,13 @@ validate_number() {
     }
 }
 
+require_value() {
+    (($# >= 2)) || {
+        printf "[Error] %s requires a value.\n" "$1" >&2
+        exit 1
+    }
+}
+
 while [[ $# -gt 0 ]]; do
     case $1 in
         --include)
@@ -67,11 +72,10 @@ while [[ $# -gt 0 ]]; do
             shift
             while [[ $# -gt 0 && ! "$1" =~ ^- ]]; do EXCLUDE_PATTERNS+=("$1"); shift; done
             ;;
-        --hf_token) HF_TOKEN="$2"; shift 2 ;;
-        -x) validate_number "threads (-x)" "$2" 10; THREADS="$2"; shift 2 ;;
-        -j) validate_number "concurrent downloads (-j)" "$2" 10; CONCURRENT="$2"; shift 2 ;;
-        --local-dir) LOCAL_DIR="$2"; shift 2 ;;
-        --revision) REVISION="$2"; shift 2 ;;
+        -x) require_value "$@"; validate_number "threads (-x)" "$2" 10; THREADS="$2"; shift 2 ;;
+        -j) require_value "$@"; validate_number "concurrent downloads (-j)" "$2" 10; CONCURRENT="$2"; shift 2 ;;
+        --local-dir) require_value "$@"; LOCAL_DIR="$2"; shift 2 ;;
+        --revision) require_value "$@"; REVISION="$2"; shift 2 ;;
         *) display_help ;;
     esac
 done
@@ -109,7 +113,7 @@ if [[ "$status_code" != "200" ]]; then
 fi
 
 if [[ "$(jq -r '.gated // false' "$METADATA_FILE")" != "false" && -z "${HF_TOKEN:-}" ]]; then
-    printf "[Error] This model requires --hf_token.\n"
+    printf "[Error] This model requires HF_TOKEN.\n"
     exit 1
 fi
 
