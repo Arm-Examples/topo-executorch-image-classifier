@@ -9,11 +9,15 @@ services:
         - hf_token
     ports:
       - "7860:7860"
-
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:7860/', timeout=3)"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 60s
 secrets:
   hf_token:
     environment: HF_TOKEN
-    
 x-topo:
   name: "Image Classifier (ExecuTorch)"
   description: |
@@ -22,7 +26,10 @@ x-topo:
     Target, upload images through a Gradio web interface, and measure inference
     results and performance. No GPU is required.
   deployment_success_message: |
-    Image classifier is running. Open http://<target-ip>:7860 to upload an image.
+    Image Classifier (ExecuTorch) is starting.
+
+    Run `topo ps` and wait until the classifier service reports a healthy status.
+    Then open http://<target-ip>:7860 in your browser to upload images.
   parameters:
     MODEL:
       description: "Hugging Face repository containing config.yaml, metadata.yaml, and an ExecuTorch model"
