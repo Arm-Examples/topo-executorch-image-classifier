@@ -8,7 +8,7 @@ ARG HF_ENDPOINT
 ARG MODEL
 
 ENV HF_ENDPOINT=${HF_ENDPOINT}
-RUN --mount=type=secret,id=hf_token,env=HF_TOKEN ./hfd.sh ${MODEL} --local-dir /downloader/model --exclude *fp32*
+RUN --mount=type=secret,id=hf_token,env=HF_TOKEN ./hfd.sh ${MODEL} --local-dir /downloader/model --exclude *fp32* --hf_token $HF_TOKEN
 
 FROM astral/uv:python3.12-bookworm-slim AS runtime
 

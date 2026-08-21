@@ -19,7 +19,7 @@ human() {
 display_help() {
     cat << EOF
 Usage:
-  hfd <REPO_ID> [--include include_pattern1 include_pattern2 ...] [--exclude exclude_pattern1 exclude_pattern2 ...] [--hf_username username] [--hf_token token] [--tool aria2c|wget] [-x threads] [-j jobs] [--dataset] [--local-dir path] [--revision rev]
+  hfd <REPO_ID> [--include include_pattern1 include_pattern2 ...] [--exclude exclude_pattern1 exclude_pattern2 ...] [--hf_token token] [--tool aria2c|wget] [-x threads] [-j jobs] [--dataset] [--local-dir path] [--revision rev]
 
 Description:
   Downloads a model or dataset from Hugging Face using the provided repo ID.
@@ -32,7 +32,6 @@ Options:
                   e.g., '--exclude *.safetensor *.md', '--include vae/*'.
   --include       (Optional) Patterns to include files for downloading (supports multiple patterns).
   --exclude       (Optional) Patterns to exclude files from downloading (supports multiple patterns).
-  --hf_username   (Optional) Hugging Face username for authentication (not email).
   --hf_token      (Optional) Hugging Face token for authentication.
   --tool          (Optional) Download tool to use: aria2c (default) or wget.
   -x              (Optional) Number of download threads for aria2c (default: 4).
@@ -46,7 +45,7 @@ Options:
 Example:
   hfd gpt2
   hfd bigscience/bloom-560m --exclude *.safetensors
-  hfd meta-llama/Llama-2-7b --hf_username myuser --hf_token mytoken -x 4
+  hfd meta-llama/Llama-2-7b --hf_token mytoken -x 4
   hfd lavita/medical-qa-shared-task-v1-toy --dataset
   hfd bartowski/Phi-3.5-mini-instruct-exl2 --revision 5_0
 EOF
@@ -76,7 +75,6 @@ while [[ $# -gt 0 ]]; do
     case $1 in
         --include) shift; while [[ $# -gt 0 && ! ($1 =~ ^--) && ! ($1 =~ ^-[^-]) ]]; do INCLUDE_PATTERNS+=("$1"); shift; done ;;
         --exclude) shift; while [[ $# -gt 0 && ! ($1 =~ ^--) && ! ($1 =~ ^-[^-]) ]]; do EXCLUDE_PATTERNS+=("$1"); shift; done ;;
-        --hf_username) HF_USERNAME="$2"; shift 2 ;;
         --hf_token) HF_TOKEN="$2"; shift 2 ;;
         --tool)
             [[ "$2" == aria2c || "$2" == wget ]] || { printf "%b[Error] Invalid tool. Use 'aria2c' or 'wget'.%b\n" "$RED" "$NC"; exit 1; }
@@ -92,9 +90,9 @@ done
 
 # A fingerprint of the options that affect the file list; a change forces regeneration.
 generate_command_string() {
-    printf 'REPO_ID=%s TOOL=%s INCLUDE=%s EXCLUDE=%s DATASET=%s HF_USERNAME=%s HF_TOKEN=%s HF_ENDPOINT=%s REVISION=%s' \
+    printf 'REPO_ID=%s TOOL=%s INCLUDE=%s EXCLUDE=%s DATASET=%s HF_TOKEN=%s HF_ENDPOINT=%s REVISION=%s' \
         "$REPO_ID" "$TOOL" "${INCLUDE_PATTERNS[*]}" "${EXCLUDE_PATTERNS[*]}" "${DATASET:-0}" \
-        "${HF_USERNAME:-}" "${HF_TOKEN:-}" "${HF_ENDPOINT:-}" "$REVISION"
+        "${HF_TOKEN:+set}" "${HF_ENDPOINT:-}" "$REVISION"
 }
 
 check_command() {
@@ -124,7 +122,7 @@ API_URL="$HF_ENDPOINT/api/$METADATA_API_PATH?blobs=true"
 METADATA_FILE="$LOCAL_DIR/.hfd/repo_metadata.json"
 
 fetch_and_save_metadata() {
-    status_code=$(curl -L -s -w "%{http_code}" -o "$METADATA_FILE" ${HF_TOKEN:+-H "Authorization: Bearer $HF_TOKEN"} "$API_URL")
+    status_code=$(curl --location-trusted -s -w "%{http_code}" -o "$METADATA_FILE" ${HF_TOKEN:+-H "Authorization: Bearer $HF_TOKEN"} "$API_URL")
     RESPONSE=$(cat "$METADATA_FILE")
     if [ "$status_code" -eq 200 ]; then
         printf "%s\n" "$RESPONSE"
@@ -143,8 +141,8 @@ check_authentication() {
     else
         printf '%s' "$1" | grep -q '"gated":[^f]' && gated=true || gated=false
     fi
-    if [[ "$gated" != "false" && ( -z "$HF_TOKEN" || -z "$HF_USERNAME" ) ]]; then
-        printf "%bThe repository requires authentication, but --hf_username and --hf_token is not passed. Please get token from https://huggingface.co/settings/tokens.\nExiting.\n%b" "$RED" "$NC"
+    if [[ "$gated" != "false" && -z "$HF_TOKEN" ]]; then
+        printf "%bThe repository requires authentication, but --hf_token was not passed. Please get a token from https://huggingface.co/settings/tokens.\nExiting.\n%b" "$RED" "$NC"
         exit 1
     fi
 }
@@ -161,7 +159,7 @@ check_authentication "$RESPONSE"
 # Total bytes of the revision (cheap, branch-specific); empty if the endpoint lacks this API.
 fetch_treesize() {
     local json
-    json=$(curl -sSL ${HF_TOKEN:+-H "Authorization: Bearer $HF_TOKEN"} "$HF_ENDPOINT/api/$REPO_API_PATH/treesize/$REVISION") || return
+    json=$(curl --location-trusted -sS ${HF_TOKEN:+-H "Authorization: Bearer $HF_TOKEN"} "$HF_ENDPOINT/api/$REPO_API_PATH/treesize/$REVISION") || return
     if command -v jq &>/dev/null; then
         printf '%s' "$json" | jq -r '.size // empty' 2>/dev/null
     else
@@ -238,7 +236,7 @@ walk_tree() {
         sed -i '$d' "$partial"   # drop a torn final line from a kill mid-append (the page re-fetches)
     fi
     while [[ -n "$url" ]]; do
-        headers=$(curl -sSL ${HF_TOKEN:+-H "Authorization: Bearer $HF_TOKEN"} -D - -o "$page" "$url") || return 1
+        headers=$(curl --location-trusted -sS ${HF_TOKEN:+-H "Authorization: Bearer $HF_TOKEN"} -D - -o "$page" "$url") || return 1
         if command -v jq &>/dev/null; then n=$(jq 'length' "$page" 2>/dev/null); else n=$(grep -o '"type":"' "$page" | wc -l); fi
         emit_page_files "$page" | filter_size_path >> "$partial"
         scanned=$(( scanned + ${n:-0} ))
