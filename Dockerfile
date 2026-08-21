@@ -15,7 +15,7 @@ FROM astral/uv:python3.12-bookworm-slim AS runtime
 WORKDIR /runtime
 
 COPY uv.lock pyproject.toml .python-version ./
-RUN uv sync --locked --no-install-project --only-group runtime
+RUN uv sync --locked --no-install-project
 
 COPY --from=model-downloader /downloader/model model
 COPY app app
