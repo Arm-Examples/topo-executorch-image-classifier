@@ -35,6 +35,6 @@ x-topo:
     HF_ENDPOINT:
       description: "Hugging Face API endpoint for downloading models"
       default: "https://huggingface.co"
-      example: "https://hf-mirror.com/"
+      example: "https://hf-mirror.com"
       hints:
         meta.type: huggingface.endpoint
