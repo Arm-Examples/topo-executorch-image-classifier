@@ -14,20 +14,6 @@ The Project demonstrates:
 
 This Project supports only ExecuTorch image classification models hosted on Hugging Face. Each model repository must contain `config.yaml` and `metadata.yaml`. These files identify the `.pte` file and configure preprocessing and postprocessing. A repository can also provide human-readable output labels in `imagenet_classes.json`.
 
-Compatible examples include:
-
-- `Arm/deit-tiny-int8-xnnpack-executorch`
-- `Arm/googlenet-int8-xnnpack-executorch-graviton-g4`
-- `Arm/googlenet-int8-xnnpack-executorch-raspberrypi5`
-- `Arm/inception-v3-int8-xnnpack-executorch-graviton-g4`
-- `Arm/inception-v3-int8-xnnpack-executorch-raspberrypi5`
-- `Arm/mobilenet-v3-small-int8-xnnpack-executorch`
-- `Arm/resnet-18-int8-xnnpack-executorch`
-- `Arm/resnet-50-int8-xnnpack-executorch`
-- `Arm/squeezenet-1-1-int8-xnnpack-executorch`
-- `Arm/swin-tiny-int8-xnnpack-executorch`
-- `Arm/vit-base-int8-xnnpack-executorch`
-
 ## Build-time parameters
 
 The `MODEL` Project parameter is passed to Docker as a build argument and resolved at build time.
