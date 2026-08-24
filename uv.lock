@@ -1091,7 +1091,12 @@ wheels = [
 name = "topo-executorch-image-classifier"
 version = "0.1.0"
 source = { virtual = "." }
-dependencies = [
+
+[package.dev-dependencies]
+downloader = [
+    { name = "pyyaml" },
+]
+runtime = [
     { name = "executorch" },
     { name = "gradio" },
     { name = "pillow" },
@@ -1103,7 +1108,10 @@ dependencies = [
 ]
 
 [package.metadata]
-requires-dist = [
+
+[package.metadata.requires-dev]
+downloader = [{ name = "pyyaml", specifier = ">=6.0.3" }]
+runtime = [
     { name = "executorch", specifier = "==1.2.0" },
     { name = "gradio", specifier = ">=6.22.0" },
     { name = "pillow", specifier = ">=12.3.0" },

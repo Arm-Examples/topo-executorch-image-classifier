@@ -4,7 +4,11 @@ version = "0.1.0"
 description = "ExecuTorch + XNNPACK image classification evaluation harness for Arm Targets"
 readme = "README.md"
 requires-python = ">=3.12"
-dependencies = [
+dependencies = []
+
+[dependency-groups]
+downloader = ["pyyaml>=6.0.3"]
+runtime = [
     "executorch==1.2.0",
     "gradio>=6.22.0",
     "pillow>=12.3.0",
