@@ -1,7 +1,7 @@
 [project]
 name = "topo-executorch-image-classifier"
 version = "0.1.0"
-description = "ExecuTorch image classification evaluation harness for Arm Targets"
+description = "ExecuTorch + XNNPACK image classification evaluation harness for Arm Targets"
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [

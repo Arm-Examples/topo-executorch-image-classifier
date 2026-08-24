@@ -5,10 +5,10 @@ RUN apk add --no-cache bash aria2 curl jq
 COPY --chmod=755 scripts/hfd.sh hfd.sh
 
 ARG HF_ENDPOINT
-ARG MODEL
+ARG HF_REPO_ID
 
 ENV HF_ENDPOINT=${HF_ENDPOINT}
-RUN --mount=type=secret,id=hf_token,env=HF_TOKEN ./hfd.sh "${MODEL}" --local-dir /downloader/model --exclude *fp32*
+RUN --mount=type=secret,id=hf_token,env=HF_TOKEN ./hfd.sh "${HF_REPO_ID}" --local-dir /downloader/model --exclude *fp32*
 
 FROM astral/uv:python3.12-bookworm-slim AS runtime
 
