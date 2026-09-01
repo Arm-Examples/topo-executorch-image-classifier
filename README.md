@@ -16,11 +16,12 @@ This Project supports only ExecuTorch image classification models that use the X
 
 ## Build-time parameters
 
-The `HF_REPO_ID` Project parameter is passed to Docker as a build argument and resolved at build time.
+The `HF_REPO_ID` and `HF_ENDPOINT` Project parameters are passed to Docker as build arguments and resolved at build time.
 
-| Parameter    | Required | Description                                           | Default                                |
-| ------------ | -------- | ----------------------------------------------------- | -------------------------------------- |
-| `HF_REPO_ID` | No       | ExecuTorch + XNNPACK model repository on Hugging Face | `Arm/vit-base-int8-xnnpack-executorch` |
+| Parameter     | Required | Description                                           | Default                                |
+| ------------- | -------- | ----------------------------------------------------- | -------------------------------------- |
+| `HF_REPO_ID`  | No       | ExecuTorch + XNNPACK model repository on Hugging Face | `Arm/vit-base-int8-xnnpack-executorch` |
+| `HF_ENDPOINT` | No       | Hugging Face API endpoint                             | `https://huggingface.co`               |
 
 ## Usage
 
@@ -28,7 +29,7 @@ Install Topo by following the instructions in the [Topo repository](https://gith
 
 ### Clone the Project
 
-The clone step will prompt you for value for the `HF_REPO_ID` parameter. Leave the input empty to select the default.
+The clone step will prompt you for values for the `HF_REPO_ID` and `HF_ENDPOINT` parameters. Leave either input empty to select its default.
 
 ```bash
 topo clone https://github.com/Arm-Examples/topo-executorch-image-classifier.git

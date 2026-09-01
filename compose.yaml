@@ -5,6 +5,7 @@ services:
       context: .
       args:
         HF_REPO_ID: Arm/vit-base-int8-xnnpack-executorch
+        HF_ENDPOINT: https://huggingface.co
       secrets:
         - hf_token
     ports:
@@ -42,3 +43,9 @@ x-topo:
         model.task: image-classification
         model.format: pte
         executorch.backend: xnnpack
+    HF_ENDPOINT:
+      description: "Hugging Face API endpoint for downloading models"
+      default: "https://huggingface.co"
+      example: "https://hf-mirror.com"
+      hints:
+        meta.type: huggingface.endpoint

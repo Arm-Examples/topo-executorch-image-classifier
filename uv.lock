@@ -1094,7 +1094,6 @@ source = { virtual = "." }
 
 [package.dev-dependencies]
 downloader = [
-    { name = "huggingface-hub" },
     { name = "pyyaml" },
 ]
 runtime = [
@@ -1111,10 +1110,7 @@ runtime = [
 [package.metadata]
 
 [package.metadata.requires-dev]
-downloader = [
-    { name = "huggingface-hub", specifier = ">=1.26.0" },
-    { name = "pyyaml", specifier = ">=6.0.3" },
-]
+downloader = [{ name = "pyyaml", specifier = ">=6.0.3" }]
 runtime = [
     { name = "executorch", specifier = "==1.2.0" },
     { name = "gradio", specifier = ">=6.22.0" },
