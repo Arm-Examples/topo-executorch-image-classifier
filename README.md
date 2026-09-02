@@ -41,11 +41,12 @@ Set a Hugging Face read token on the Host, and deploy the Project to the Target:
 
 ```bash
 cd topo-executorch-image-classifier
-export HF_TOKEN=<hugging-face-read-token>
 topo deploy --target <user@hostname>
 ```
 
-Topo builds the image on the Host and transfers the finished image to the Target over SSH. The Target does not receive the token and does not need network access to download the model.
+Topo builds the image on the Host and transfers the finished image to the Target over SSH. The Target does not need network access to download the model.
+
+> **Note:** To download a private model at build time, set `HF_TOKEN` on the Host before running `topo deploy`. The token must have read access to the repository. The build mounts it as a secret and does not store it in the image or transfer it to the Target. Public repositories do not require a token.
 
 ### Open the web interface
 
