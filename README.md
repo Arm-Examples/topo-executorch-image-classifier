@@ -12,7 +12,7 @@ The Project demonstrates:
 
 ## Model compatibility
 
-This Project supports only ExecuTorch image classification models that use the XNNPACK backend and are hosted on Hugging Face. Each model repository must contain `config.yaml` and `metadata.yaml`. These files identify the `.pte` file and configure preprocessing and postprocessing. A repository can also provide human-readable output labels in `imagenet_classes.json`.
+This Project supports only ExecuTorch image classification models that use the XNNPACK backend and are hosted on Hugging Face. Each model repository must contain `config.yaml` and `metadata.yaml`. These files identify the `.pte` file and configure preprocessing and postprocessing. A repository can also provide human-readable output labels in `imagenet_classes.json`. If it does not and `metadata.yaml` identifies `calibration.dataset_name` as ImageNet-1K, the runtime uses the categories from Torchvision's `SqueezeNet1_1_Weights.IMAGENET1K_V1` metadata. Other models without labels use generic class indices.
 
 ## Build-time parameters
 

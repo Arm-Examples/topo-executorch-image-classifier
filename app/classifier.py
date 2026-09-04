@@ -9,6 +9,7 @@ import yaml
 from executorch.runtime import Runtime
 from PIL import Image
 from torchvision import transforms
+from torchvision.models import SqueezeNet1_1_Weights
 
 
 _TRANSFORMS = {
@@ -22,6 +23,14 @@ _TRANSFORMS = {
 def _load_yaml(path: Path) -> dict:
     with path.open() as file:
         return yaml.safe_load(file)
+
+
+def _can_use_imagenet_1k_labels(metadata: dict) -> bool:
+    match metadata:
+        case {"calibration": {"dataset_name": str(dataset_name)}}:
+            return dataset_name.casefold() == "imagenet-1k"
+        case _:
+            return False
 
 
 class Preprocessor:
@@ -76,12 +85,15 @@ class Classifier:
     def __init__(self, model_dir: str | Path):
         model_dir = Path(model_dir)
         config = _load_yaml(model_dir / "config.yaml")
+        metadata = _load_yaml(model_dir / "metadata.yaml")
         self._preprocessor = Preprocessor(config["input"]["preprocessing"])
 
         labels_path = model_dir / "imagenet_classes.json"
         if labels_path.is_file():
             with labels_path.open() as file:
                 labels = json.load(file)
+        elif _can_use_imagenet_1k_labels(metadata):
+            labels = SqueezeNet1_1_Weights.IMAGENET1K_V1.meta["categories"]
         else:
             labels = {}
         self._postprocessor = Postprocessor(config["output"]["postprocessing"], labels)
@@ -89,8 +101,6 @@ class Classifier:
 
         sample = model_dir / "sample_input.jpg"
         self.sample_image = str(sample) if sample.is_file() else None
-
-        metadata = _load_yaml(model_dir / "metadata.yaml")
 
         self.title = metadata.get("title", "Image Classifier")
         self.id = metadata.get("id")
