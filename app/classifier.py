@@ -12,8 +12,26 @@ from torchvision import transforms
 from torchvision.models import SqueezeNet1_1_Weights
 
 
+def _resize(options):
+    """Build a Resize transform from torchvision or model-config options."""
+    if not isinstance(options, dict):
+        return transforms.Resize(options)
+
+    options = options.copy()
+    if "shorter_edge" in options:
+        if "size" in options:
+            raise ValueError("resize cannot define both size and shorter_edge")
+        options["size"] = options.pop("shorter_edge")
+
+    interpolation = options.get("interpolation")
+    if isinstance(interpolation, str):
+        options["interpolation"] = transforms.InterpolationMode(interpolation)
+
+    return transforms.Resize(**options)
+
+
 _TRANSFORMS = {
-    "resize": transforms.Resize,
+    "resize": _resize,
     "center_crop": transforms.CenterCrop,
     "to_tensor": lambda _: transforms.ToTensor(),
     "normalize": lambda options: transforms.Normalize(**options),
