@@ -4,8 +4,8 @@ services:
     build:
       context: .
       args:
-        HF_REPO_ID: Arm/vit-base-int8-xnnpack-executorch
-        HF_ENDPOINT: https://huggingface.co
+        HF_REPO_ID: ${HF_REPO_ID:-Arm/vit-base-int8-xnnpack-executorch}
+        HF_ENDPOINT: ${HF_ENDPOINT:-https://huggingface.co}
       secrets:
         - hf_token
     ports:
